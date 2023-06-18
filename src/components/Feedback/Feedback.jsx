@@ -1,6 +1,9 @@
 import PropTypes from 'prop-types';
 import { Component } from 'react';
-import './Feedback.css';
+import Statistics from '../Statistics/Statistics';
+import Section from '../Section/Section';
+import FeedbackOptions from '../FeedbackOptions/FeedbackOptions';
+import Notification from '../Notification/Notification';
 
 class Feedback extends Component {
   state = {
@@ -9,8 +12,7 @@ class Feedback extends Component {
     bad: 0,
   };
 
-  handleIncrement = e => {
-    const { name } = e.target;
+  handleIncrement = name => {
     this.setState(prevState => ({ [name]: prevState[name] + 1 }));
   };
 
@@ -33,33 +35,27 @@ class Feedback extends Component {
   };
 
   render() {
+    const btns = Object.keys(this.state);
     const { good, neutral, bad } = this.state;
 
     return (
-      <div>
-        <h3>Please leave feedback</h3>
-        <div class="buttons">
-          <button type="button" name="good" onClick={this.handleIncrement}>
-            Good
-          </button>
-          <button type="button" name="neutral" onClick={this.handleIncrement}>
-            Neutral
-          </button>
-          <button type="button" name="bad" onClick={this.handleIncrement}>
-            Bad
-          </button>
-        </div>
-        <h3>Statistics</h3>
-        <div class="statistics">
-          <span>Good: {good}</span>
-          <span>Neutral: {neutral}</span>
-          <span>Bad: {bad}</span>
-          <span>Total: {this.countTotalFeedback()}</span>
-          <span>
-            Positive feedback: {this.countPositiveFeedbackPercentage()}%
-          </span>
-        </div>
-      </div>
+      <Section title={'Please leave feedback'}>
+        <FeedbackOptions
+          options={btns}
+          onLeaveFeedback={this.handleIncrement}
+        />
+        {good || neutral || bad > 0 ? (
+          <Statistics
+            good={good}
+            neutral={neutral}
+            bad={bad}
+            total={this.countTotalFeedback()}
+            positivePercentage={this.countPositiveFeedbackPercentage()}
+          />
+        ) : (
+          <Notification message="There is no feedback"></Notification>
+        )}
+      </Section>
     );
   }
 }

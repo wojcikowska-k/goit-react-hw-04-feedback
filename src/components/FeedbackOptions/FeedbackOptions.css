@@ -9,4 +9,5 @@
   cursor: pointer;
   font-size: 18px;
   padding: 2px 15px;
+  text-transform: capitalize;
 }
