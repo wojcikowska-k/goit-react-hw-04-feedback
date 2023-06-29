@@ -1,64 +1,66 @@
 import PropTypes from 'prop-types';
-import { Component } from 'react';
+
 import Statistics from '../Statistics/Statistics';
 import Section from '../Section/Section';
 import FeedbackOptions from '../FeedbackOptions/FeedbackOptions';
 import Notification from '../Notification/Notification';
+import React, { useState } from 'react';
 
-class Feedback extends Component {
-  state = {
-    good: 0,
-    neutral: 0,
-    bad: 0,
+const Feedback = () => {
+  const [good, setGood] = useState(0);
+  const [neutral, setNeutral] = useState(0);
+  const [bad, setBad] = useState(0);
+
+  const handleIncrement = event => {
+    const {
+      target: { name },
+    } = event;
+
+    if (name === 'good') {
+      setGood(good + 1);
+    } else if (name === 'neutral') {
+      setNeutral(neutral + 1);
+    } else if (name === 'bad') {
+      setBad(bad + 1);
+    }
   };
 
-  handleIncrement = name => {
-    this.setState(prevState => ({ [name]: prevState[name] + 1 }));
-  };
-
-  countTotalFeedback = () => {
-    const { good, neutral, bad } = this.state;
+  const countTotalFeedback = () => {
     let total = 0;
     total = good + neutral + bad;
     return total;
   };
 
-  countPositiveFeedbackPercentage = () => {
-    const { good } = this.state;
+  const countPositiveFeedbackPercentage = () => {
     if (good > 0) {
       let positiveTotal = 0;
-      positiveTotal = Math.round((good / this.countTotalFeedback()) * 100);
+      positiveTotal = Math.round((good / countTotalFeedback()) * 100);
       return positiveTotal;
     } else {
       return 0;
     }
   };
 
-  render() {
-    const btns = Object.keys(this.state);
-    const { good, neutral, bad } = this.state;
-
-    return (
-      <Section title={'Please leave feedback'}>
-        <FeedbackOptions
-          options={btns}
-          onLeaveFeedback={this.handleIncrement}
+  return (
+    <Section title={'Please leave feedback'}>
+      <FeedbackOptions
+        options={['good', 'neutral', 'bad']}
+        onLeaveFeedback={handleIncrement}
+      />
+      {good || neutral || bad > 0 ? (
+        <Statistics
+          good={good}
+          neutral={neutral}
+          bad={bad}
+          total={countTotalFeedback()}
+          positivePercentage={countPositiveFeedbackPercentage()}
         />
-        {good || neutral || bad > 0 ? (
-          <Statistics
-            good={good}
-            neutral={neutral}
-            bad={bad}
-            total={this.countTotalFeedback()}
-            positivePercentage={this.countPositiveFeedbackPercentage()}
-          />
-        ) : (
-          <Notification message="There is no feedback"></Notification>
-        )}
-      </Section>
-    );
-  }
-}
+      ) : (
+        <Notification message="There is no feedback"></Notification>
+      )}
+    </Section>
+  );
+};
 
 Feedback.propTypes = {
   good: PropTypes.number,
